@@ -1,0 +1,138 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{模型建立}
+
+针对问题一，本节将从电耗建模、除尘效率建模（Deutsch方程）、振打衰减建模、多级串联建模和振打峰值估算五个角度建立定量关系模型。具体过程如下。
+
+\textbf{步骤1：电耗—电压关系建模}
+
+电除尘器每个电场本质是一个高压静电场，整流变压器输出功率$P_i\propto U_i\cdot I_i$，而电晕电流$I_i$在工作区间近似与电压$U_i$成正比（电晕放电的伏安特性），因此单电场电耗与电压平方成正比：
+\begin{equation}
+    P_i = k_i U_i^2
+\end{equation}
+四个电场并联供电，总电耗为：
+\begin{equation}
+    P_{total} = \sum_{i=1}^{4} k_i U_i^2
+\end{equation}
+其中$k_i$为第$i$电场的电耗系数，可通过线性最小二乘拟合历史数据得到。将$U_i^2$作为设计矩阵的列，$k_i$作为待解系数，式(2)关于$k_i$是线性的，用\texttt{np.linalg.lstsq}求解。
+
+实际拟合发现简单模型$R^2=0.3567<0.9$，说明$P\propto U^2$的纯理论关系存在偏差（变压器损耗、电晕电流非线性等）。引入常数项$c$代表固定空载损耗（变压器铁损、控制系统功耗），并约束$k_i\geq0$（物理要求电耗不随$U^2$递减），扩展模型为：
+\begin{equation}
+    P_{total} = \sum_{i=1}^{4} k_i U_i^2 + c
+\end{equation}
+用\texttt{scipy.optimize.lsq\_linear}（TRF算法）约束$k_i\geq0$求解，扩展后$R^2=0.9349$，达标且物理合理。
+
+\textbf{步骤2：Deutsch方程除尘效率建模}
+
+Deutsch方程是电除尘器领域最经典的理论公式\cite{deutsch1922}，由Deutsch于1922年从粒子受力平衡推导得到。粉尘颗粒在电场中受电场力$qE$与Stokes阻力$6\pi\mu r v$平衡，得到驱进速度$\omega=qE/(6\pi\mu r)$。在气流均匀分布、颗粒充分荷电假设下，对单级电场做粒子数守恒积分，得到单级除尘效率：
+\begin{equation}
+    \eta_i = 1 - \exp\left(-\frac{\omega_i A_i}{Q}\right)
+\end{equation}
+其中$A_i$为集尘面积，$Q$为烟气流量，$\omega_i$为驱进速度。
+
+进一步将驱进速度与电压联系起来：电场强度$E\propto U_i$，颗粒荷电量$q\propto E\propto U_i$，严格驱进速度$\omega=\frac{2\varepsilon_0 E_p E_c r}{3\mu}$，其中电晕场$E_c\propto U_i$、沉积场$E_p\propto U_i$，故$\omega\propto U_i^2$。令$k_iA_i$为合并系数（集尘面积$A_i$是硬件几何参数无法从运行数据辨识，驱进速度系数$k_i$也依赖颗粒物性，两者乘积才是可辨识量），得到：
+\begin{equation}
+    \eta_i = 1 - \exp\left(-\frac{k_i A_i \cdot U_i^2}{Q}\right)
+\end{equation}
+
+\textbf{步骤3：振打周期对效率的衰减建模}
+
+振打周期$T_i$越大，极板积灰越厚，积灰层抑制后续颗粒沉降使效率下降。物理上"积灰厚度随时间增长"近似线性，"效率随积灰厚度下降"近似指数（类似RC放电），建模为：
+\begin{equation}
+    \eta_i(T_i) = \eta_{i,0} \cdot \exp\left(-\alpha_i \cdot \max(0,\, T_i - T_{ref,i})\right)
+\end{equation}
+其中$T_{ref,i}$取各电场历史振打周期中位数，作为基准运行点。当$T_i\leq T_{ref,i}$时认为积灰不严重，衰减项为$1$；只有$T_i$超过基准值才开始衰减。$\alpha_i$为振打衰减系数。合并后单级效率完整形式为：
+\begin{equation}
+    \eta_i = \left(1 - \exp\left(-\frac{k_i A_i \cdot U_i^2}{Q}\right)\right)\cdot \exp\left(-\alpha_i \cdot \max(0,\, T_i - T_{ref,i})\right)
+\end{equation}
+
+\textbf{步骤4：多级串联与总出口浓度}
+
+四个电场串联，前一级出口即后一级入口，假设各级独立（假设$H_1$），则：
+\begin{equation}
+    C_i = C_{i-1}(1 - \eta_i),\quad C_0 = C_{in}
+\end{equation}
+递推得总出口浓度：
+\begin{equation}
+    C_{out} = C_{in} \cdot 1000 \cdot \prod_{i=1}^{4}(1 - \eta_i)
+\end{equation}
+其中$1000$是$\text{g/Nm}^3\to\text{mg/Nm}^3$单位换算。
+
+\textbf{步骤5：振打瞬时排放峰值半经验估算}
+
+振打瞬间会有秒级浓度飙升，但数据为分钟级无法直接观测峰值。根据物理机理：振打时脱落粉尘量正比于极板积灰厚度，积灰厚度正比于振打周期，脱落粉尘进入气流造成瞬时浓度升高正比于当前浓度，建立半经验关系：
+\begin{equation}
+    C_{peak} = \sum_{i=1}^{4} \alpha_i \cdot \max(0,\, T_i - T_{ref,i}) \cdot C_{in} \cdot 1000 \cdot 0.1
+\end{equation}
+其中$0.1$为经验系数（假设脱落粉尘约$10\%$进入气流）。需说明：此式为基于机理的量级估算，分钟级数据无法直接观测秒级峰值。
+
+\textbf{步骤6：Deutsch参数拟合策略}
+
+因$C_{out}$方差极小，8参数（$kA_{1\sim4}$，$\alpha_{1\sim4}$）拟合严重欠定。引入物理先验：同型号ESP四电场几何相似，$kA$应相近，设$kA_i=kA_0\cdot g_i$，其中$g=[1.0,1.0,0.9,0.9]$（后电场粉尘更细/比电阻略高，$kA$低$10\%$），参数从8降到5。
+
+$C_{out}$数值在$50$量级而外推目标在$5\sim10$量级，跨两个数量级，直接平方残差被大量级主导。改用对数空间残差：
+\begin{equation}
+    \text{loss} = \sum_{j=1}^{n}\left(\ln \hat{C}_{out,j} - \ln C_{out,j}\right)^2
+\end{equation}
+用\texttt{L-BFGS-B}带边界约束求解\cite{nocedal2006}，多起点50次避免局部最优。物理初值由$\eta_i\approx0.9$反推：$kA_i=-\frac{Q}{U_i^2}\ln(1-0.9)\approx\frac{2.3Q}{U_i^2}$。同时$\alpha_i$下界设$0.001$防止拟合成$0$。
+
+综上所述，本节完成了电耗模型、Deutsch效率模型、振打衰减模型、多级串联模型和峰值估算模型的建立，接下来将进行参数拟合与求解。
+
+% ============================================================
+\subsubsection{模型求解}
+
+基于上述模型，本节利用历史运行数据进行参数拟合与求解。
+
+\textbf{电耗模型求解。}用约束最小二乘拟合式(3)，得到各电场电耗系数如表\ref{tab:电耗系数}所示，$R^2=0.9349$。
+
+\begin{table}[H]
+  \centering
+  \caption{电耗模型拟合结果}
+  \begin{tabularx}{\textwidth}{CCCCCCC}
+    \toprule
+    参数 & $k_1$ & $k_2$ & $k_3$ & $k_4$ & $c$ & $R^2$ \\
+    \midrule
+    拟合值 & 0.082 & 0.076 & 0.095 & 0.088 & 892.5 & 0.9349 \\
+    \bottomrule
+  \end{tabularx}
+  \label{tab:电耗系数}
+\end{table}
+
+\textbf{Deutsch模型求解。}用对数空间残差+L-BFGS-B+多起点50次拟合式(7)，得到参数如表\ref{tab:Deutsch参数}所示。
+
+\begin{table}[H]
+  \centering
+  \caption{Deutsch模型拟合参数}
+  \begin{tabularx}{\textwidth}{CCCCCC}
+    \toprule
+    参数 & 第1电场 & 第2电场 & 第3电场 & 第4电场 & 说明 \\
+    \midrule
+    $kA_i$ & 282.69 & 282.69 & 254.42 & 254.42 & $kA_0=282.69$ \\
+    $\alpha_i$ & 0.0158 & 0.0054 & 0.001 & 0.001 & 下界$0.001$ \\
+    $T_{ref,i}$ (s) & 233 & 233 & 445 & 445 & 历史中位数 \\
+    \bottomrule
+  \end{tabularx}
+  \label{tab:Deutsch参数}
+\end{table}
+
+\textbf{特征重要性交叉验证。}用随机森林\cite{pedregosa2011}与梯度提升拟合$C_{out}$对$T_{in},C_{in},Q,U_{1\sim4},T_{1\sim4}$共11个特征的关系，各特征重要性均匀（$0.08\sim0.11$），Pearson相关系数均不显著（$p>0.05$），反向印证了$C_{out}$方差极小、数据驱动学不到信息的判断，为机理为主的路线提供了数据证据。
+
+\textbf{时序交叉验证。}前5天（7200行）训练，后2天（2880行）测试：$P_{total}$测试$R^2=0.876$，泛化尚可；$C_{out}$测试RMSE$=48$，预测值与真实值同数量级但偏差存在，印证限幅下外推不确定性较大，需在后续优化中注意。
+
+各操作参数与$C_{out}$的关系曲线如图\ref{fig:relation_curves}所示，入口条件与$C_{out}$的三维关系如图\ref{fig:relation_3d}所示。由图可见，$C_{out}$历史数据集中在50\,$\text{mg/Nm}^3$附近，各参数对$C_{out}$的影响在历史区间内不显著，进一步印证了传感器限幅的判断。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/relation_curves.png}
+  \caption{各操作参数与出口粉尘浓度的关系曲线}
+  \label{fig:relation_curves}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/relation_3d.png}
+  \caption{入口条件与出口粉尘浓度的三维关系}
+  \label{fig:relation_3d}
+\end{figure}
+
+综合以上结果，问题一建立了入口条件与操作参数对出口粉尘浓度的定量关系模型（式7--9），电耗与电压的定量关系模型（式3），以及振打瞬时排放峰值的半经验估算公式（式10）。Deutsch方程以物理机理保证了外推到$C_{out}\leq10$甚至$\leq5$区域的单调性合理，为后续问题二至四的优化求解提供了模型基础。

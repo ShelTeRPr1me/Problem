@@ -1,0 +1,91 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{模型建立}
+
+针对问题三，本节将从两工况对比、数值灵敏度计算和优先级判定三个角度展开。具体过程如下。
+
+\textbf{步骤1：两差异工况对比}
+
+选取高浓度工况（工况0）与低浓度工况（工况5），从两个层面分析差异原因：
+
+（1）物理机理层面：高浓度工况粉尘负荷大，需更高电压维持效率、更短振打周期频繁清灰；低浓度工况粉尘负荷小，可适当降低电压省电、延长振打周期减少机械磨损。
+
+（2）数据特征层面：直接对比两工况最优解的$\sum U_i$、$\sum T_i$数值差异。
+
+\textbf{步骤2：数值灵敏度计算}
+
+采用中心差分法计算$C_{out}$和$P_{total}$对各操作参数的偏导数：
+\begin{equation}
+    S_{x_i}^{C} = \frac{\partial C_{out}}{\partial x_i} \approx \frac{C_{out}(x + h e_i) - C_{out}(x - h e_i)}{2h}
+\end{equation}
+\begin{equation}
+    S_{x_i}^{P} = \frac{\partial P_{total}}{\partial x_i} \approx \frac{P_{total}(x + h e_i) - P_{total}(x - h e_i)}{2h}
+\end{equation}
+其中$x=[U_{1\sim4},T_{1\sim4}]$，$e_i$为单位向量，步长$h_i=0.01\times(x_{max,i}-x_{min,i})$取变量范围的1\%。
+
+步长减半一致性验证：计算$h$和$h/2$两次差分，比较$\text{consistency}=|S_{h/2}^C-S_h^C|/(|S_h^C|+10^{-12})$，若$>0.1$则步长不合适，需调整。
+
+\textbf{步骤3：无量纲弹性系数与优先级判定}
+
+定义弹性系数：
+\begin{equation}
+    E_{x_i}^{C} = \frac{\partial \ln C_{out}}{\partial \ln x_i} = \frac{x_i}{C_{out}}\cdot\frac{\partial C_{out}}{\partial x_i},\quad E_{x_i}^{P} = \frac{\partial \ln P}{\partial \ln x_i} = \frac{x_i}{P}\cdot\frac{\partial P}{\partial x_i}
+\end{equation}
+
+弹性系数无量纲，电压（kV）和振打（s）可比较。性价比用弹性比：
+\begin{equation}
+    \text{性价比}_i = \left|\frac{E_{x_i}^{C}}{E_{x_i}^{P}}\right| = \left|\frac{P}{C_{out}}\cdot\frac{S_{x_i}^{C}}{S_{x_i}^{P}}\right|
+\end{equation}
+
+对四个电场求平均：
+\begin{equation}
+    \overline{\text{ratio}}_U = \frac{1}{4}\sum_{i=1}^{4}\left|\frac{E_{U_i}^{C}}{E_{U_i}^{P}}\right|,\quad \overline{\text{ratio}}_T = \frac{1}{4}\sum_{i=1}^{4}\left|\frac{E_{T_i}^{C}}{E_{T_i}^{P}}\right|
+\end{equation}
+
+若$\overline{\text{ratio}}_U > \overline{\text{ratio}}_T$则\textbf{优先调电压}（单位电耗增量可换来更多浓度下降），反之优先调振打。
+
+% ============================================================
+\subsubsection{模型求解}
+
+\textbf{两工况对比结果。}高浓度工况（工况0）与低浓度工况（工况5）的最优策略对比如表\ref{tab:工况对比}所示。
+
+\begin{table}[H]
+  \centering
+  \caption{高浓度工况与低浓度工况最优策略对比}
+  \label{tab:工况对比}
+  \zihao{-5}
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{cccccccccccc}
+    \toprule
+    工况 & $C_{in}$ & $T_{in}$ & $U_1$ & $U_2$ & $U_3$ & $U_4$ & $T_1$ & $T_2$ & $T_3$ & $T_4$ & $P^*$(kW) \\
+    \midrule
+    0(高) & 44.34 & 119.5 & 45.9 & 57.1 & 71.0 & 69.8 & 221 & 169 & 392 & 400 & 1786.1 \\
+    5(低) & 26.01 & 120.8 & 45.9 & 47.9 & 71.0 & 69.8 & 209 & 208 & 416 & 415 & 1678.3 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+差异分析：高浓度工况总电压243.8\,kV $>$ 低浓度工况234.6\,kV，高浓度工况总振打周期1181\,s $<$ 低浓度工况1247\,s。高浓度工况下粉尘负荷大，极板积灰快，需缩短振打周期并提高电压维持效率；低浓度工况下粉尘负荷小，可适当降低电压省电、延长振打周期减少机械磨损。两工况最优参数对比如图\ref{fig:param_compare}所示。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/param_compare.png}
+  \caption{高浓度工况与低浓度工况最优参数对比}
+  \label{fig:param_compare}
+\end{figure}
+
+\textbf{灵敏度与优先级判定结果。}计算各操作参数的弹性系数性价比，灵敏度热力图如图\ref{fig:sensitivity_heatmap}所示。
+\begin{equation}
+    \overline{\text{ratio}}_U = 18.06 \gg \overline{\text{ratio}}_T = 0.00
+\end{equation}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/sensitivity_heatmap.png}
+  \caption{各操作参数灵敏度与性价比热力图}
+  \label{fig:sensitivity_heatmap}
+\end{figure}
+
+判定结论：\textbf{优先调电压}。即单位电耗增量通过调压可换来更多浓度下降，调压是降低排放最经济有效的手段。
+
+说明：振打弹性性价比为零的根因在于电耗模型不含振打（$E_{T_i}^{P}\approx 0$），且最优解$T_i\leq T_{ref,i}$使振打衰减项不激活（$E_{T_i}^{C}\approx 0$）。这反映了当前振打模型仅建模了"周期过长效率下降"的单向影响，未建模"周期过短清灰更彻底效率提升"的效应，是模型结构的已知局限。

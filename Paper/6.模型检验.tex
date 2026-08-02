@@ -1,0 +1,51 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{模型检验与分析}
+
+为验证本文构建的模型的有效性和稳健性，进行以下检验。
+
+\subsection{误差分析}
+
+\begin{table}[H]
+  \centering
+  \caption{模型误差分析结果}
+  \label{tab:error}
+  \begin{tabularx}{\textwidth}{CCCC}
+    \toprule
+    指标 & 训练集 & 测试集 & 说明 \\
+    \midrule
+    $P_{total}$\,$R^2$ & 0.9349 & 0.876 & 扩展电耗模型决定系数 \\
+    $P_{total}$\,RMSE & 37.2 & 37.8 & 电耗均方根误差(kW) \\
+    $C_{out}$\,RMSE & 56.4 & 48.0 & 出口浓度均方根误差($\text{mg/Nm}^3$) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+如表\ref{tab:error}所示，电耗模型训练集$R^2=0.9349$、测试集$R^2=0.876$，泛化性能尚可。$C_{out}$的$R^2$因历史方差极小（$\sigma=0.17$）而失真（$R^2$为大负数），改用RMSE评价：训练集56.4、测试集48.0，预测值与真实值同数量级但偏差存在，印证了传感器限幅下外推不确定性较大的判断。
+
+\subsection{灵敏度分析}
+
+Sobol全局灵敏度分析\cite{saltelli2010}结果如图\ref{fig:sobol_barplot}所示，振打同步效应分析如图\ref{fig:rapping_sync}所示，排放限值扫描曲线如图\ref{fig:r_sensitivity}所示。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/sobol_barplot.png}
+  \caption{Sobol全局灵敏度分析}
+  \label{fig:sobol_barplot}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/rapping_sync.png}
+  \caption{振打周期同步效应分析}
+  \label{fig:rapping_sync}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/r_sensitivity.png}
+  \caption{排放限值对最优电耗的灵敏度扫描}
+  \label{fig:r_sensitivity}
+\end{figure}
+
+Sobol分析表明电压参数（$U_{1\sim4}$）对$C_{out}$的一阶效应占主导，振打参数（$T_{1\sim4}$）效应较小，与问题三的局部灵敏度结论一致。排放限值扫描显示$C_{limit}$从10降至$5\;\text{mg/Nm}^3$时电耗增幅约7\%，与问题四的定量结果吻合，验证了模型的内部一致性。

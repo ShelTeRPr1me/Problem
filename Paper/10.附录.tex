@@ -1,0 +1,33 @@
+
+\makeatletter
+\let\@oldaddcontentsline\addcontentsline
+\renewcommand{\addcontentsline}[3]{}
+\section*{附录}
+\let\addcontentsline\@oldaddcontentsline
+\makeatother
+
+\begin{table}[H]
+  \centering
+  \caption{附件说明表}
+  \label{tab:appendix}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\textwidth}{LX}
+    \toprule
+    文件 & 说明 \\
+    \midrule
+    \texttt{main.py} & 主流程编排：数据加载→建模→寻优→灵敏度→收紧→输出 \\
+    \texttt{data\_loader/loader.py} & 数据加载、缺失值时间线性插补、异常值标记、各电场边界统计 \\
+    \texttt{modeling/power.py} & 电耗模型拟合：约束最小二乘，$P=\sum k_iU_i^2+c$ \\
+    \texttt{modeling/deutsch.py} & Deutsch参数拟合：共享$kA_0$、对数空间残差、L-BFGS-B多起点 \\
+    \texttt{modeling/feature.py} & 随机森林+梯度提升特征重要性交叉验证 \\
+    \texttt{optim/regime.py} & K-Means工况划分+轮廓系数选$K$ \\
+    \texttt{optim/solve.py} & SLSQP多起点约束寻优+差分进化备选 \\
+    \texttt{sensitivity/jacobian.py} & 中心差分数值雅可比+步长减半验证 \\
+    \texttt{sensitivity/priority.py} & 无量纲弹性系数性价比排序 \\
+    \texttt{tighten/resolve.py} & 排放收紧重求解+电耗增幅+可行性校验 \\
+    \texttt{tighten/advice.py} & 高浓度工况应对建议 \\
+    \texttt{report/plots.py} & 各类图表生成（关系曲线、工况散点、灵敏度热力图等） \\
+    \texttt{Cement\_ESP\_Data.csv} & 原始运行数据（10080行×14列） \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

@@ -1,0 +1,89 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{模型建立}
+
+针对问题二，本节将从工况划分、约束优化模型建立和求解策略三个角度展开。具体过程如下。
+
+\textbf{步骤1：K-Means工况划分}
+
+将$(C_{in},T_{in},Q)$三维标准化空间划分为$K$个典型工况$\Omega_k$，满足：
+\begin{equation}
+    \bigcup_{k=1}^{K} \Omega_k = \Omega_{all},\quad \Omega_j \cap \Omega_k = \emptyset\;(j\neq k)
+\end{equation}
+
+轮廓系数定义为：
+\begin{equation}
+    s_i = \frac{b_i - a_i}{\max(a_i, b_i)}
+\end{equation}
+其中$a_i$为样本到同簇其他点平均距离，$b_i$为到最近异簇平均距离，$s_i\in[-1,1]$越大表示聚类越紧凑分离。在$K\in[2,8]$范围内选取轮廓系数最大且每工况样本占比$\geq 3\%$的$K$值。
+
+\textbf{步骤2：约束优化模型}
+
+每个工况下决策变量为$[U_1,U_2,U_3,U_4,T_1,T_2,T_3,T_4]$共8维，优化模型为：
+\begin{equation}
+    \min_{U_i,T_i}\ P_{total} = \sum_{i=1}^{4} k_i U_i^2 + c
+\end{equation}
+\begin{equation}
+    \text{s.t.}\quad C_{out}(T_{in}^{(k)},C_{in}^{(k)},Q^{(k)},U,T) \leq C_{limit}
+\end{equation}
+\begin{equation}
+    U_{min,i} \leq U_i \leq U_{max,i},\quad i=1,2,3,4
+\end{equation}
+\begin{equation}
+    T_{min,i} \leq T_i \leq \min(T_{max,i},\,T_{crit,i}),\quad i=1,2,3,4
+\end{equation}
+
+目标函数仅含电压，因电耗模型$P=\sum k_iU_i^2+c$不含振打（振打电机功耗相对主电场可忽略），振打通过约束（影响$C_{out}$）间接参与优化。
+
+\textbf{步骤3：求解策略}
+
+采用SLSQP（Sequential Least SQuares Programming）算法\cite{nocedal2006}求解，该算法属于序列二次规划类，在约束边界附近用二次近似，对中等规模（8维）带不等式约束的非线性优化效果好。因约束$C_{out}\leq 10$在8维空间定义的可行域可能非凸，单起点易陷局部最优，故采用多起点策略（10个起点）：第0个起点取边界中点，其余9个在边界内随机均匀采样，取目标最小且满足约束的解。固定随机种子42保证可复现。
+
+当SLSQP全部起点不收敛或约束不满足时，切换差分进化全局备选算法，将约束罚入目标：
+\begin{equation}
+    \tilde{P}(x) = \begin{cases} P_{total}(x), & C_{out} \leq C_{limit} \\ 10^6 + (C_{out} - C_{limit})\times 10^4, & C_{out} > C_{limit} \end{cases}
+\end{equation}
+
+振打动态约束采用双重处理：（1）硬约束$T_i\leq T_{crit,i}$直接写入边界；（2）目标惩罚项$P_{total}+\lambda\cdot\max(0,T_i-T_{crit,i})^2$，即使硬约束因数值误差被轻微突破，惩罚项也会把解拉回安全区。
+
+% ============================================================
+\subsubsection{模型求解}
+
+基于上述模型，对6个典型工况分别求解约束优化问题，结果如表\ref{tab:问题2结果}所示。
+
+\begin{table}[H]
+  \centering
+  \caption{问题二各工况最优操作参数与电耗}
+  \label{tab:问题2结果}
+  \zihao{-5}
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{ccccccccccccc}
+    \toprule
+    工况 & 样本数 & $C_{in}$ & $T_{in}$ & $U_1$ & $U_2$ & $U_3$ & $U_4$ & $T_1$ & $T_2$ & $T_3$ & $T_4$ & $P^*$(kW) \\
+    \midrule
+    0 & 1309 & 44.34 & 119.5 & 45.9 & 57.1 & 71.0 & 69.8 & 221 & 169 & 392 & 400 & 1786.1 \\
+    1 & 2184 & 26.60 & 131.4 & 45.9 & 45.4 & 71.0 & 63.7 & 173 & 171 & 366 & 437 & 1622.7 \\
+    2 & 1009 & 43.77 & 131.4 & 45.9 & 45.7 & 71.0 & 69.8 & 221 & 169 & 392 & 400 & 1655.5 \\
+    3 & 1583 & 42.93 & 119.9 & 45.9 & 45.4 & 71.0 & 69.6 & 227 & 232 & 427 & 443 & 1651.5 \\
+    4 & 2360 & 40.19 & 130.0 & 45.9 & 55.8 & 71.0 & 69.8 & 184 & 225 & 394 & 417 & 1770.6 \\
+    5 & 1635 & 26.01 & 120.8 & 45.9 & 47.9 & 71.0 & 69.8 & 209 & 208 & 416 & 415 & 1678.3 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+各工况最优解均满足$C_{out}=10.0\;\text{mg/Nm}^3$的排放约束。K-Means工况划分结果如图\ref{fig:regime_scatter}所示，6个工况在$(C_{in},T_{in})$空间中分布合理，区间内相近、区间间差异明显。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{figures/regime_scatter.png}
+  \caption{K-Means工况划分散点图}
+  \label{fig:regime_scatter}
+\end{figure}
+
+分析结果可见：
+
+（1）高浓度工况（工况0，$C_{in}=44.34$）最优电耗$P^*=1786.1\;\text{kW}$最高，低浓度工况（工况1，$C_{in}=26.60$）$P^*=1622.7\;\text{kW}$最低，电耗随入口浓度递增，符合物理规律。
+
+（2）各工况$U_1$均贴下界45.9\,kV，$U_3$均贴上界71.0\,kV，说明第1电场电压对降低$C_{out}$贡献最小，第3电场贡献最大；$U_2$和$U_4$在内部调节，是各工况差异化调节的主要自由度。
+
+（3）高浓度工况振打周期整体偏短（工况0总振打1181\,s），需更频繁清灰；低浓度工况振打周期较长（工况1总振打1147\,s），可适当延长减少机械磨损。

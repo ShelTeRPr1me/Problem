@@ -1,0 +1,50 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{符号说明}
+
+本文使用的主要符号及其含义如表\ref{tab:符号说明}所示。
+
+\begin{longtable}{>{\centering\arraybackslash}p{0.15\textwidth}>{\centering\arraybackslash}p{0.80\textwidth}}
+  \caption{符号说明}
+  \label{tab:符号说明} \\
+  \toprule
+  符号 & 说明 \\
+  \midrule
+  \endfirsthead
+  \caption{符号说明（续）} \\
+  \toprule
+  符号 & 说明 \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  $U_i$ & 第$i$电场二次电压 (kV)，$i=1,2,3,4$ \\
+  $T_i$ & 第$i$电场振打周期 (s)，$i=1,2,3,4$ \\
+  $T_{in}$ & 烟气入口温度 ($^\circ$C) \\
+  $C_{in}$ & 入口粉尘浓度 (g/Nm$^3$) \\
+  $Q$ & 烟气流量 (Nm$^3$/h) \\
+  $C_{out}$ & 出口粉尘浓度 (mg/Nm$^3$) \\
+  $P_{total}$ & 总除尘电耗 (kW) \\
+  $\eta_i$ & 第$i$电场单级除尘效率 \\
+  $C_i$ & 第$i$电场出口浓度，$C_0=C_{in}$ \\
+  $C_{peak}$ & 振打瞬时排放峰值 (mg/Nm$^3$) \\
+  $k_i$ & 第$i$电场电耗系数 \\
+  $c$ & 固定空载损耗 (kW) \\
+  $kA_i$ & 第$i$电场Deutsch合并系数 \\
+  $kA_0$ & 共享Deutsch基准系数，$kA_i=kA_0\cdot g_i$ \\
+  $g_i$ & 电场几何修正因子，$g=[1,1,0.9,0.9]$ \\
+  $\alpha_i$ & 第$i$电场振打衰减系数 \\
+  $T_{ref,i}$ & 第$i$电场参考振打周期（历史中位数） \\
+  $T_{crit,i}$ & 第$i$电场振打安全上限（历史95分位数） \\
+  $C_{limit}$ & 超低排放标准，$10\;\text{mg/Nm}^3$ \\
+  $C_{limit}'$ & 收紧后排放标准，$5\;\text{mg/Nm}^3$ \\
+  $S_{x_i}^C$ & $C_{out}$对$x_i$的偏导数 \\
+  $S_{x_i}^P$ & $P_{total}$对$x_i$的偏导数 \\
+  $E_{x_i}^C$ & $C_{out}$对$x_i$的弹性系数 \\
+  $E_{x_i}^P$ & $P_{total}$对$x_i$的弹性系数 \\
+  $\Omega_k$ & 第$k$个典型工况 \\
+  $\Delta P\%$ & 电耗百分比增幅 \\
+  $\omega_i$ & 第$i$电场驱进速度 \\
+  $A_i$ & 第$i$电场集尘面积 \\
+  $n$ & 电场数量，$n=4$ \\
+\end{longtable}
