@@ -1,0 +1,17 @@
+
+\subsection{模型的推广}
+
+（1）\textbf{多目标Pareto优化\cite{deb2002}。}将电耗最低与振打峰值最低作为双目标，求Pareto前沿，为决策者提供"电耗-峰值"权衡曲线，而非单一最优解。初步计算结果如图\ref{fig:pareto_front}所示。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/pareto_front.png}
+  \caption{电耗与振打峰值的多目标Pareto前沿}
+  \label{fig:pareto_front}
+\end{figure}
+
+（2）\textbf{鲁棒优化（机会约束）。}将排放约束改为概率约束$\Pr(C_{out}\leq C_{limit})\geq 1-\varepsilon$，考虑入口条件与模型参数的不确定性，使最优解在扰动下仍以高概率满足排放标准。
+
+（3）\textbf{时序动态优化。}利用7天数据的时序结构，识别日内周期与工况突变点，建立时变工况下的动态优化策略，而非静态分工况寻优。
+
+（4）\textbf{推广至其他除尘设备。}Deutsch方程框架可推广至袋式除尘器（将驱进速度替换为过滤风速）或其他工业ESP（钢铁、火电），仅需重新拟合参数。
