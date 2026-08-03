@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.14)  2 AUG 2026 22:02
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.14)  3 AUG 2026 09:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1158,6 +1158,10 @@ File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowlength=\dimen351
 \pgfarrowwidth=\dimen352
 \pgfarrowlinewidth=\dimen353
+)
+(c:/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
+brarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
 ) (./main.aux)
 \openout1 = `main.aux'.
 
@@ -1328,36 +1332,41 @@ Overfull \hbox (1.23639pt too wide) in alignment at lines 20--52
  [] [] 
  []
 
-[3]) (./3.模型假设.tex
+[3]) (./3.模型假设.tex) (./5.模型的建立与求解.tex
 
-[4]) (./5.模型的建立与求解.tex (./5.1.问题1的建立求解.tex (./5.1.1.分析与准备.tex
+[4] (./5.1.问题1的建立求解.tex (./5.1.1.分析与准备.tex
 
 [5]
+File: figures/timeseries_7day.png Graphic file (type bmp)
+<figures/timeseries_7day.png>
 
-[6]) (./5.1.2.建模与求解.tex
 
-[7]
+[6]
+
+[7]) (./5.1.2.建模与求解.tex
 
 [8]
 
-[9])) (./5.2.问题2的建立求解.tex (./5.2.1.分析与准备.tex
+[9]
 
-[10]
+[10])) (./5.2.问题2的建立求解.tex (./5.2.1.分析与准备.tex
 
-[11]) (./5.2.2.建模与求解.tex
+[11]
 
-[12]
+[12]) (./5.2.2.建模与求解.tex
 
 [13]
+
+[14]
 File: figures/regime_scatter.png Graphic file (type bmp)
 <figures/regime_scatter.png>
 
 
-[14])) (./5.3.问题3的建立求解.tex (./5.3.1.分析与准备.tex) (./5.3.2.建模与求解.tex
-
-[15]
+[15])) (./5.3.问题3的建立求解.tex (./5.3.1.分析与准备.tex) (./5.3.2.建模与求解.tex
 
 [16]
+
+[17]
 File: figures/param_compare.png Graphic file (type bmp)
 <figures/param_compare.png>
 File: figures/sensitivity_heatmap.png Graphic file (type bmp)
@@ -1370,38 +1379,46 @@ Overfull \hbox (12.03426pt too wide) in paragraph at lines 89--90
 
 
 
-[17]
+[18]
 Overfull \hbox (4.85023pt too wide) in paragraph at lines 113--113
  []|$\OML/cmm/m/it/12.05 C[]$\TU/TimesNewRoman(0)/m/n/12.05 (g/Nm$[]$)| 
  []
 
 )) (./5.4.问题4的建立求解.tex (./5.4.1.分析与准备.tex
 
-[18]) (./5.4.2.建模与求解.tex
+[19]) (./5.4.2.建模与求解.tex
 
-[19]
+[20]
 File: figures/delta_power.png Graphic file (type bmp)
 <figures/delta_power.png>
 File: figures/climit_scan.png Graphic file (type bmp)
 <figures/climit_scan.png>
 
 
-[20])))
+[21])))
 
-[21] (./6.模型检验.tex
+[22] (./6.模型检验.tex
 
-[22]
+[23]
 File: figures/sobol_barplot.png Graphic file (type bmp)
 <figures/sobol_barplot.png>
 
 
-[23]) (./7.模型评价-优点.tex) (./7.模型评价-缺点.tex
+[24]
+Overfull \hbox (42.10657pt too wide) in paragraph at lines 74--75
+[]$\OML/cmm/m/it/12.05 T[]$ \TU/SimSun(0)/b/n/12.05 敏 感 性。|  \TU/SimSun(0)/m/n/
+12.05 为 验 证 振 打 最 优 周 期 对 $\OML/cmm/m/it/12.05 T[]$ \TU/SimSun(0)/m/n/12.05 选 择
+ 的 依 赖 程 度，|  分 别 设 置 $\OML/cmm/m/it/12.05 T[] \OT1/cmr/m/n/12.05 =$\TU/TimesNe
+wRoman(0)/m/n/12.05 [200,200,400,400]
+ []
 
-[24]) (./8.模型改进.tex) (./8.模型推广.tex
 
-[25]) (./9.参考文献.tex
 
-[26]) (./10.附录.tex
+[25]) (./7.模型评价-优点.tex) (./7.模型评价-缺点.tex
+
+[26]) (./8.模型改进.tex) (./8.模型推广.tex) (./9.参考文献.tex
+
+[27]) (./10.附录.tex
 Underfull \hbox (badness 1546) in paragraph at lines 32--32
 []|\TU/SimSun(0)/m/n/12.05 电 耗 模 型 拟 合：|  约 束 最 小 二 乘，| $\OML/cmm/m/it/12.05 P 
 \OT1/cmr/m/n/12.05 =
@@ -1409,7 +1426,9 @@ Underfull \hbox (badness 1546) in paragraph at lines 32--32
 
 )
 
-[27] (./main.aux)
+[28]
+
+[29] (./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2022/08/05>
@@ -1419,15 +1438,15 @@ L3 programming layer <2022/08/05>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 1F5264C56D6828F5A38C9B7F6F04CAB7;4600.
+(rerunfilecheck)             Checksum: 5B481A68B5C9EB254F7611938F2044B0;4752.
  ) 
 Here is how much of TeX's memory you used:
- 34541 strings out of 473832
- 732745 string characters out of 5733157
- 1142895 words of memory out of 5000000
- 56862 multiletter control sequences out of 15000+600000
+ 34654 strings out of 473832
+ 735097 string characters out of 5733157
+ 1143843 words of memory out of 5000000
+ 56971 multiletter control sequences out of 15000+600000
  580494 words of font info for 197 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 108i,14n,125p,682b,758s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,14n,125p,682b,853s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (28 pages).
+Output written on main.pdf (30 pages).

@@ -2,6 +2,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{模型的建立与求解}
 
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    box/.style={draw, rounded corners=4pt, minimum width=3.2cm, minimum height=0.9cm, align=center, font=\small},
+    arr/.style={->, thick, >=stealth},
+    node distance=0.6cm and 0.6cm
+  ]
+    \node[box, fill=blue!10] (data) {数据预处理\\限幅识别};
+    \node[box, fill=blue!10, right=0.6cm of data] (p1) {问题1\\Deutsch机理建模};
+    \node[box, fill=green!10, right=0.6cm of p1] (p2) {问题2\\K-Means+约束优化};
+    \node[box, fill=orange!10, below=1.2cm of p2] (p3) {问题3\\灵敏度+优先级};
+    \node[box, fill=red!10, left=0.6cm of p3] (p4) {问题4\\排放收紧+增幅};
+    \node[box, fill=gray!10, left=0.6cm of p4] (check) {模型检验\\Sobol+敏感性};
+
+    \draw[arr] (data) -- (p1);
+    \draw[arr] (p1) -- (p2);
+    \draw[arr] (p2) -- (p3);
+    \draw[arr] (p3) -- (p4);
+    \draw[arr] (p4) -- (check);
+    \draw[arr, dashed] (check) -- (p1);
+  \end{tikzpicture}
+  \caption{四问递进研究流程}
+  \label{fig:workflow}
+\end{figure}
+
 \input{5.1.问题1的建立求解.tex}
 
 \input{5.2.问题2的建立求解.tex}
