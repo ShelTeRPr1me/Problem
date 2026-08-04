@@ -6,28 +6,196 @@
 \let\addcontentsline\@oldaddcontentsline
 \makeatother
 
+本论文支撑材料包含全部可运行源程序、配置文件及中间结果图表，已按规范压缩为单个文件提交。以下为支撑材料的完整文件列表及说明。
+
+支撑材料目录结构如下：
+
+{\small
+\begin{verbatim}
+支撑材料/
+|-- code/
+|   |-- main.py
+|   |-- requirements.txt
+|   |-- config/
+|   |   +-- config.yaml
+|   |-- data_loader/
+|   |   |-- loader.py
+|   |   +-- db.py
+|   |-- modeling/
+|   |   |-- deutsch.py
+|   |   |-- power.py
+|   |   +-- feature.py
+|   |-- optim/
+|   |   |-- regime.py
+|   |   +-- solve.py
+|   |-- sensitivity/
+|   |   |-- jacobian.py
+|   |   |-- priority.py
+|   |   +-- compare.py
+|   |-- tighten/
+|   |   |-- resolve.py
+|   |   +-- advice.py
+|   |-- report/
+|   |   |-- plots.py
+|   |   |-- tables.py
+|   |   |-- plot_style.py
+|   |   |-- timeseries_plot.py
+|   |   +-- _rep.py
+|   |-- bayesian_estimation.py
+|   |-- cross_validation.py
+|   |-- model_evaluation.py
+|   |-- sobol_sensitivity.py
+|   |-- param_sensitivity.py
+|   |-- pareto_optimization.py
+|   |-- robust_optimization.py
+|   |-- priority_all_regimes.py
+|   |-- additional_analysis.py
+|   |-- check_bounds.py
+|   +-- diag_conc.py
++-- outputs/
+    |-- timeseries_input.png
+    |-- timeseries_output.png
+    |-- regime_scatter.png
+    |-- param_compare.png
+    |-- power_compare.png
+    |-- sens_elastic_C.png
+    |-- sens_elastic_P.png
+    |-- sens_ratio.png
+    |-- delta_power.png
+    |-- delta_pct.png
+    |-- climit_scan.png
+    |-- sobol_barplot.png
+    |-- pareto_front.png
+    |-- relation_curves.png
+    |-- relation_3d.png
+    |-- sensitivity_heatmap.png
+    |-- rapping_sync.png
+    |-- r_sensitivity.png
+    |-- results.md
+    |-- run_meta.json
+    |-- model_evaluation.json
+    |-- sobol_indices.json
+    |-- param_sensitivity.json
+    |-- bayesian_ci.json
+    |-- pareto_front.json
+    |-- robust_optimization.json
+    |-- priority_all_regimes.json
+    |-- additional_analysis.json
+    +-- tref_sensitivity.json
+\end{verbatim}
+}
+
 \begin{table}[H]
   \centering
-  \caption{附件说明表}
-  \label{tab:appendix}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{LX}
+  \caption{源程序文件列表}
+  \label{tab:appendix_code}
+  \renewcommand{\arraystretch}{1.05}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{lX}
     \toprule
     文件 & 说明 \\
     \midrule
     \texttt{main.py} & 主流程编排：数据加载→建模→寻优→灵敏度→收紧→输出 \\
-    \texttt{data\_loader/loader.py} & 数据加载、缺失值时间线性插补、异常值标记、各电场边界统计 \\
-    \texttt{modeling/power.py} & 电耗模型拟合：约束最小二乘，$P=\sum k_iU_i^2+c$ \\
-    \texttt{modeling/deutsch.py} & Deutsch参数拟合：共享$kA_0$、对数空间残差、L-BFGS-B多起点 \\
-    \texttt{modeling/feature.py} & 随机森林+梯度提升特征重要性交叉验证 \\
-    \texttt{optim/regime.py} & K-Means工况划分+轮廓系数选$K$ \\
-    \texttt{optim/solve.py} & SLSQP多起点约束寻优+差分进化备选 \\
-    \texttt{sensitivity/jacobian.py} & 中心差分数值雅可比+步长减半验证 \\
-    \texttt{sensitivity/priority.py} & 无量纲弹性系数性价比排序 \\
-    \texttt{tighten/resolve.py} & 排放收紧重求解+电耗增幅+可行性校验 \\
-    \texttt{tighten/advice.py} & 高浓度工况应对建议 \\
-    \texttt{report/plots.py} & 各类图表生成（关系曲线、工况散点、灵敏度热力图等） \\
-    \texttt{Cement\_ESP\_Data.csv} & 原始运行数据（10080行×14列） \\
+    \texttt{requirements.txt} & Python依赖包列表 \\
+    \texttt{config/config.yaml} & 全局配置（随机种子、工况数$K$、排放限值等） \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{data\_loader/} 数据加载模块} \\
+    \texttt{loader.py} & 数据加载、缺失值时间线性插补、异常值标记、各电场边界统计 \\
+    \texttt{db.py} & 数据库读取接口（备用） \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{modeling/} 机理建模模块} \\
+    \texttt{deutsch.py} & Deutsch参数拟合：共享$kA_0$、对数空间残差、L-BFGS-B多起点、振打双向偏离衰减 \\
+    \texttt{power.py} & 电耗模型拟合：约束最小二乘，$P=\sum k_iU_i^2+\sum\beta_i/T_i+c$ \\
+    \texttt{feature.py} & 随机森林+梯度提升特征重要性交叉验证 \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{optim/} 优化求解模块} \\
+    \texttt{regime.py} & K-Means工况划分+轮廓系数选$K$ \\
+    \texttt{solve.py} & SLSQP多起点约束寻优+差分进化备选 \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{sensitivity/} 灵敏度分析模块} \\
+    \texttt{jacobian.py} & 中心差分数值雅可比+步长减半验证 \\
+    \texttt{priority.py} & 无量纲弹性系数性价比排序与隐性成本修正 \\
+    \texttt{compare.py} & 双工况对比分析 \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{tighten/} 排放收紧模块} \\
+    \texttt{resolve.py} & 排放收紧重求解+电耗增幅+可行性校验 \\
+    \texttt{advice.py} & 高浓度工况应对建议 \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{report/} 输出与可视化模块} \\
+    \texttt{plots.py} & 各类图表生成（关系曲线、工况散点、灵敏度热力图等） \\
+    \texttt{tables.py} & 结果表格Markdown输出 \\
+    \texttt{plot\_style.py} & 统一绘图样式 \\
+    \texttt{timeseries\_plot.py} & 时序图生成 \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{根目录辅助脚本}} \\
+    \texttt{bayesian\_estimation.py} & Deutsch参数贝叶斯估计（Laplace近似95\% CI） \\
+    \texttt{cross\_validation.py} & 电耗模型交叉验证 \\
+    \texttt{model\_evaluation.py} & 模型误差分析（训练集/测试集$R^2$、RMSE） \\
+    \texttt{sobol\_sensitivity.py} & Sobol全局灵敏度分析 \\
+    \texttt{param\_sensitivity.py} & $kA_0$、$\beta_i$、$T_{ref}$参数敏感性分析 \\
+    \texttt{pareto\_optimization.py} & 电耗-振打峰值双目标Pareto优化 \\
+    \texttt{robust\_optimization.py} & 机会约束鲁棒优化 \\
+    \texttt{priority\_all\_regimes.py} & 全工况性价比与修正后优先级计算 \\
+    \texttt{additional\_analysis.py} & 补充分析（振打同步性等） \\
+    \texttt{check\_bounds.py} & 优化边界合理性检查 \\
+    \texttt{diag\_conc.py} & $C_{out}$浓度诊断分析 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{中间结果图表文件列表}
+  \label{tab:appendix_outputs}
+  \renewcommand{\arraystretch}{1.05}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    文件 & 说明 \\
+    \midrule
+    \texttt{timeseries\_input.png} & 7天入口工况时序与工况划分 \\
+    \texttt{timeseries\_output.png} & 7天操作参数与出口浓度时序 \\
+    \texttt{regime\_scatter.png} & K-Means工况划分散点图 \\
+    \texttt{param\_compare.png} & 高/低浓度工况最优参数对比 \\
+    \texttt{power\_compare.png} & 高/低浓度工况电耗对比 \\
+    \texttt{sens\_elastic\_C.png} & 浓度弹性系数图 \\
+    \texttt{sens\_elastic\_P.png} & 电耗弹性系数图 \\
+    \texttt{sens\_ratio.png} & 性价比图 \\
+    \texttt{delta\_power.png} & 收紧前后电耗对比 \\
+    \texttt{delta\_pct.png} & 收紧前后电耗增幅 \\
+    \texttt{climit\_scan.png} & 排放限值扫描权衡曲线 \\
+    \texttt{sobol\_barplot.png} & Sobol全局灵敏度柱状图 \\
+    \texttt{pareto\_front.png} & 电耗-振打峰值Pareto前沿 \\
+    \texttt{relation\_curves.png} & 参数-浓度关系曲线 \\
+    \texttt{relation\_3d.png} & 参数-浓度3D曲面 \\
+    \texttt{sensitivity\_heatmap.png} & 灵敏度热力图 \\
+    \texttt{rapping\_sync.png} & 振打同步性分析图 \\
+    \texttt{r\_sensitivity.png} & 过频系数$r$敏感性图 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{数值结果文件列表}
+  \label{tab:appendix_json}
+  \renewcommand{\arraystretch}{1.05}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    文件 & 说明 \\
+    \midrule
+    \texttt{results.md} & 全部结果的Markdown汇总 \\
+    \texttt{run\_meta.json} & 运行元信息（种子、工况数、$R^2$等） \\
+    \texttt{model\_evaluation.json} & 模型误差分析数值结果 \\
+    \texttt{sobol\_indices.json} & Sobol一阶与总效应指数 \\
+    \texttt{param\_sensitivity.json} & 参数敏感性数值结果 \\
+    \texttt{bayesian\_ci.json} & 贝叶斯95\%置信区间 \\
+    \texttt{pareto\_front.json} & Pareto前沿数值数据 \\
+    \texttt{robust\_optimization.json} & 鲁棒优化数值结果 \\
+    \texttt{priority\_all\_regimes.json} & 全工况优先级数值结果 \\
+    \texttt{additional\_analysis.json} & 补充分析数值结果 \\
+    \texttt{tref\_sensitivity.json} & $T_{ref}$敏感性数值结果 \\
     \bottomrule
   \end{tabularx}
 \end{table}

@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1785723183.61037 "d:/WorkSpace/Problem/Paper/main.tex" "main.pdf" "main" 1785723184.11207 2
+["pdflatex"] 1785761641.82893 "d:/WorkSpace/Problem/Paper/main.tex" "main.pdf" "main" 1785761642.39009 2
   "c:/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1763109977 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1763109551 1288 655e228510b4c2a1abe905c368440826 ""
   "c:/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty" 1763110190 7984 7dbb9280f03c0a315425f1b4f35d43ee ""
@@ -10,10 +10,10 @@
   "c:/texlive/2025/texmf-dist/web2c/texmf.cnf" 1763109181 42148 61becc7c670cd061bb319c643c27fdd4 ""
   "c:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1763112708 3346136 76a7a11355991d5ba1cb61afcaed123f ""
   "c:/texlive/2025/texmf.cnf" 1763112526 713 e69b156964470283e0530f5060668171 ""
-  "d:/WorkSpace/Problem/Paper/main.tex" 1785722490 1392 7da3fb068c12cfe56709548b23a6a31b ""
+  "d:/WorkSpace/Problem/Paper/main.tex" 1785739544 1392 7da3fb068c12cfe56709548b23a6a31b ""
   "format.cls" 1785660190 26446 5e96ed7cbd799d19d79d5b86dac47935 ""
-  "main.aux" 1785723183 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "main.tex" 1785722490 1392 7da3fb068c12cfe56709548b23a6a31b ""
+  "main.aux" 1785761641 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "main.tex" 1785739544 1392 7da3fb068c12cfe56709548b23a6a31b ""
   (generated)
   "main.aux"
   "main.log"

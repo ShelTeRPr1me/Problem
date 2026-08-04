@@ -25,21 +25,21 @@ def plot_relation_curves(model, df, out_dir) :
     Ts = np.linspace(df["Temp_C"].min(), df["Temp_C"].max(), 50)
     axes[0, 0].plot(Ts, [predict_cout(params, t, Cin_med, Q_med, U_med, T_med) for t in Ts], color = COLOR)
     axes[0, 0].set_xlabel("入口温度 (℃)")
-    axes[0, 0].set_ylabel("$C_{out}$ (mg/Nm$^3$)")
+    axes[0, 0].set_ylabel(r"$C_{out}$ (mg/Nm$^3$)")
     axes[0, 0].set_title("温度-$C_{out}$ 关系")
     style_ax(axes[0, 0])
 
     Cs = np.linspace(df["C_in_gNm3"].min(), df["C_in_gNm3"].max(), 50)
     axes[0, 1].plot(Cs, [predict_cout(params, Tin_med, c, Q_med, U_med, T_med) for c in Cs], color = COLOR)
-    axes[0, 1].set_xlabel("入口浓度 (g/Nm$^3$)")
-    axes[0, 1].set_ylabel("$C_{out}$ (mg/Nm$^3$)")
+    axes[0, 1].set_xlabel(r"入口浓度 (g/Nm$^3$)")
+    axes[0, 1].set_ylabel(r"$C_{out}$ (mg/Nm$^3$)")
     axes[0, 1].set_title("$C_{in}$-$C_{out}$ 关系")
     style_ax(axes[0, 1])
 
     Us = np.linspace(df["U1_kV"].min(), df["U1_kV"].max(), 50)
     axes[1, 0].plot(Us, [predict_cout(params, Tin_med, Cin_med, Q_med, [u] + U_med[1:], T_med) for u in Us], color = COLOR)
     axes[1, 0].set_xlabel("$U_1$ 电压 (kV)")
-    axes[1, 0].set_ylabel("$C_{out}$ (mg/Nm$^3$)")
+    axes[1, 0].set_ylabel(r"$C_{out}$ (mg/Nm$^3$)")
     axes[1, 0].set_title("电压-$C_{out}$ 关系")
     style_ax(axes[1, 0])
 
@@ -47,7 +47,7 @@ def plot_relation_curves(model, df, out_dir) :
     T1s = np.linspace(df["T1_s"].min(), df["T1_s"].max(), 50)
     axes[1, 1].plot(T1s, [predict_peak(params, [t] + T_med[1:], Cin_med) for t in T1s], color = COLOR)
     axes[1, 1].set_xlabel("$T_1$ 振打周期 (s)")
-    axes[1, 1].set_ylabel("$C_{peak}$ (mg/Nm$^3$)")
+    axes[1, 1].set_ylabel(r"$C_{peak}$ (mg/Nm$^3$)")
     axes[1, 1].set_title("振打周期-$C_{peak}$ 关系")
     style_ax(axes[1, 1])
 
@@ -58,12 +58,12 @@ def plot_relation_curves(model, df, out_dir) :
 
 def plot_regime_scatter(regimes, df, out_dir) :
     os.makedirs(out_dir, exist_ok = True)
-    fig, ax = plt.subplots(figsize = (10, 8))
+    fig, ax = plt.subplots(figsize = (8, 6))
     labels = np.array(regimes["labels"])
     scatter = ax.scatter(df["C_in_gNm3"], df["Temp_C"], c=labels, cmap="viridis", alpha=0.6, s=10)
     plt.colorbar(scatter, ax=ax, label="工况编号")
-    ax.set_xlabel("入口浓度 (g/Nm$^3$)")
-    ax.set_ylabel("入口温度 (℃)")
+    ax.set_xlabel(r"入口浓度 (g/Nm$^3$)")
+    ax.set_ylabel(r"入口温度 (℃)")
     ax.set_title("K-Means工况划分散点图")
     style_ax(ax)
     plt.tight_layout()
@@ -74,66 +74,81 @@ def plot_regime_scatter(regimes, df, out_dir) :
 def plot_param_compare(cmp, out_dir) :
     os.makedirs(out_dir, exist_ok = True)
     rA, rB = cmp["regime_A"], cmp["regime_B"]
-    fig, axes = plt.subplots(1, 3, figsize = (18, 6))
-
     x = np.arange(4)
     w = 0.35
+
+    # 图A: 电压与振打周期对比 (2子图上下排列)
+    fig, axes = plt.subplots(1, 2, figsize = (14, 6))
     axes[0].bar(x - w/2, rA["U"], w, label=f"工况{rA['id']}(高浓度)", color=PALETTE[0])
     axes[0].bar(x + w/2, rB["U"], w, label=f"工况{rB['id']}(低浓度)", color=PALETTE[1])
-    axes[0].set_xticks(x); axes[0].set_xticklabels(["U1", "U2", "U3", "U4"])
+    axes[0].set_xticks(x); axes[0].set_xticklabels(["$U_1$", "$U_2$", "$U_3$", "$U_4$"])
     axes[0].set_ylabel("电压 (kV)"); axes[0].set_title("电压对比"); axes[0].legend()
     style_ax(axes[0])
 
     axes[1].bar(x - w/2, rA["T"], w, label=f"工况{rA['id']}", color=PALETTE[0])
     axes[1].bar(x + w/2, rB["T"], w, label=f"工况{rB['id']}", color=PALETTE[1])
-    axes[1].set_xticks(x); axes[1].set_xticklabels(["T1", "T2", "T3", "T4"])
+    axes[1].set_xticks(x); axes[1].set_xticklabels(["$T_1$", "$T_2$", "$T_3$", "$T_4$"])
     axes[1].set_ylabel("振打周期 (s)"); axes[1].set_title("振打周期对比"); axes[1].legend()
     style_ax(axes[1])
-
-    axes[2].bar(["$P$ 高浓度", "$P$ 低浓度"], [rA["P"], rB["P"]], color=[PALETTE[0], PALETTE[1]])
-    axes[2].set_ylabel("总电耗 (kW)"); axes[2].set_title("电耗对比")
-    style_ax(axes[2])
 
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "param_compare.png"), dpi=150)
     plt.close()
 
+    # 图B: 电耗对比 (单独一张)
+    fig, ax = plt.subplots(figsize = (7, 6))
+    ax.bar([f"工况{rA['id']}(高浓度)", f"工况{rB['id']}(低浓度)"], [rA["P"], rB["P"]], color=[PALETTE[0], PALETTE[1]], width=0.5)
+    ax.set_ylabel("总电耗 (kW)"); ax.set_title("电耗对比")
+    style_ax(ax)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "power_compare.png"), dpi=150)
+    plt.close()
+
 
 def plot_sensitivity_heatmap(sens, out_dir) :
     os.makedirs(out_dir, exist_ok = True)
-    fig, axes = plt.subplots(1, 3, figsize = (18, 5))
 
-    # 优先用无量纲弹性系数 E=∂ln y/∂ln x, 消除电压(kV)/振打(s)量纲差异
     if "EC_U" in sens:
         SC = np.array([sens["EC_U"], sens["EC_T"]])
         SP = np.array([sens["EP_U"], sens["EP_T"]])
-        lbl_C, lbl_P, lbl_R = "浓度弹性 $E^C$", "电耗弹性 $E^P$", "性价比 $|E^C/E^P|$"
+        lbl_C, lbl_P, lbl_R = r"浓度弹性 $E^C$", r"电耗弹性 $E^P$", r"性价比 $|E^C/E^P|$"
     else :
         SC = np.array([sens["SC_U"], sens["SC_T"]])
         SP = np.array([sens["SP_U"], sens["SP_T"]])
-        lbl_C, lbl_P, lbl_R = "浓度灵敏度 $S^C$", "电耗灵敏度 $S^P$", "性价比 $|S^C/S^P|$"
+        lbl_C, lbl_P, lbl_R = r"浓度灵敏度 $S^C$", r"电耗灵敏度 $S^P$", r"性价比 $|S^C/S^P|$"
 
-    im0 = axes[0].imshow(SC, cmap="coolwarm", aspect="auto")
-    axes[0].set_yticks([0, 1]); axes[0].set_yticklabels(["U", "T"])
-    axes[0].set_xticks(range(4)); axes[0].set_xticklabels(["1", "2", "3", "4"])
-    axes[0].set_xlabel("电场编号")
-    axes[0].set_title(lbl_C); plt.colorbar(im0, ax=axes[0], label="弹性值"); style_ax(axes[0], grid=False)
-
-    im1 = axes[1].imshow(SP, cmap="coolwarm", aspect="auto")
-    axes[1].set_yticks([0, 1]); axes[1].set_yticklabels(["U", "T"])
-    axes[1].set_xticks(range(4)); axes[1].set_xticklabels(["1", "2", "3", "4"])
-    axes[1].set_xlabel("电场编号")
-    axes[1].set_title(lbl_P); plt.colorbar(im1, ax=axes[1], label="弹性值"); style_ax(axes[1], grid=False)
-
-    ratio = np.abs(SC) / (np.abs(SP) + 1e-12)
-    im2 = axes[2].imshow(ratio, cmap="YlOrRd", aspect="auto")
-    axes[2].set_yticks([0, 1]); axes[2].set_yticklabels(["U", "T"])
-    axes[2].set_xticks(range(4)); axes[2].set_xticklabels(["1", "2", "3", "4"])
-    axes[2].set_xlabel("电场编号")
-    axes[2].set_title(lbl_R); plt.colorbar(im2, ax=axes[2], label="比值"); style_ax(axes[2], grid=False)
-
+    # 图A: 浓度弹性/灵敏度
+    fig, ax = plt.subplots(figsize = (6, 5))
+    im0 = ax.imshow(SC, cmap="coolwarm", aspect="auto")
+    ax.set_yticks([0, 1]); ax.set_yticklabels(["U", "T"])
+    ax.set_xticks(range(4)); ax.set_xticklabels(["1", "2", "3", "4"])
+    ax.set_xlabel("电场编号")
+    ax.set_title(lbl_C); plt.colorbar(im0, ax=ax, label="弹性值"); style_ax(ax, grid=False)
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "sensitivity_heatmap.png"), dpi=150)
+    plt.savefig(os.path.join(out_dir, "sens_elastic_C.png"), dpi=150)
+    plt.close()
+
+    # 图B: 电耗弹性/灵敏度
+    fig, ax = plt.subplots(figsize = (6, 5))
+    im1 = ax.imshow(SP, cmap="coolwarm", aspect="auto")
+    ax.set_yticks([0, 1]); ax.set_yticklabels(["U", "T"])
+    ax.set_xticks(range(4)); ax.set_xticklabels(["1", "2", "3", "4"])
+    ax.set_xlabel("电场编号")
+    ax.set_title(lbl_P); plt.colorbar(im1, ax=ax, label="弹性值"); style_ax(ax, grid=False)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "sens_elastic_P.png"), dpi=150)
+    plt.close()
+
+    # 图C: 性价比
+    ratio = np.abs(SC) / (np.abs(SP) + 1e-12)
+    fig, ax = plt.subplots(figsize = (6, 5))
+    im2 = ax.imshow(ratio, cmap="YlOrRd", aspect="auto")
+    ax.set_yticks([0, 1]); ax.set_yticklabels(["U", "T"])
+    ax.set_xticks(range(4)); ax.set_xticklabels(["1", "2", "3", "4"])
+    ax.set_xlabel("电场编号")
+    ax.set_title(lbl_R); plt.colorbar(im2, ax=ax, label="比值"); style_ax(ax, grid=False)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "sens_ratio.png"), dpi=150)
     plt.close()
 
 
@@ -141,27 +156,33 @@ def plot_delta_power(dp, out_dir) :
     os.makedirs(out_dir, exist_ok = True)
     deltas = dp["deltas"]
     valid = [d for d in deltas if d["delta_pct"] is not None]
-    fig, axes = plt.subplots(1, 2, figsize = (14, 6))
 
     ids = [d["regime_id"] for d in valid]
     p10 = [d["P10"] for d in valid]
     p5 = [d["P5"] for d in valid]
     x = np.arange(len(ids))
     w = 0.35
-    axes[0].bar(x - w/2, p10, w, label="$P^*(10)$", color=PALETTE[0])
-    axes[0].bar(x + w/2, p5, w, label="$P^*(5)$", color=PALETTE[3])
-    axes[0].set_xticks(x); axes[0].set_xticklabels([f"工况{i}" for i in ids])
-    axes[0].set_ylabel("电耗 (kW)"); axes[0].set_title("收紧前后电耗对比"); axes[0].legend()
-    style_ax(axes[0])
 
-    dpct = [d["delta_pct"] for d in valid]
-    axes[1].bar(x, dpct, color = PALETTE[2])
-    axes[1].set_xticks(x); axes[1].set_xticklabels([f"工况{i}" for i in ids])
-    axes[1].set_ylabel("电耗增幅 (%)"); axes[1].set_title("$\\Delta P$ 增幅")
-    style_ax(axes[1])
-
+    # 图A: 收紧前后电耗对比
+    fig, ax = plt.subplots(figsize = (8, 6))
+    ax.bar(x - w/2, p10, w, label="$P^*(10)$", color=PALETTE[0])
+    ax.bar(x + w/2, p5, w, label="$P^*(5)$", color=PALETTE[3])
+    ax.set_xticks(x); ax.set_xticklabels([f"工况{i}" for i in ids])
+    ax.set_ylabel("电耗 (kW)"); ax.set_title("收紧前后电耗对比"); ax.legend()
+    style_ax(ax)
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "delta_power.png"), dpi=150)
+    plt.close()
+
+    # 图B: 电耗增幅
+    dpct = [d["delta_pct"] for d in valid]
+    fig, ax = plt.subplots(figsize = (8, 6))
+    ax.bar(x, dpct, color = PALETTE[2])
+    ax.set_xticks(x); ax.set_xticklabels([f"工况{i}" for i in ids])
+    ax.set_ylabel("电耗增幅 (%)"); ax.set_title("$\\Delta P$ 增幅")
+    style_ax(ax)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "delta_pct.png"), dpi=150)
     plt.close()
 
 
@@ -184,7 +205,7 @@ def plot_relation_3d(model, df, out_dir) :
             for j in range(len(ys)) :
                 Z[j, i] = f(xs[i], ys[j])
         ax.plot_surface(Xg, Yg, Z, cmap="viridis", alpha=0.85, edgecolor="none")
-        ax.set_xlabel(xl); ax.set_ylabel(yl); ax.set_zlabel("$C_{out}$ (mg/Nm$^3$)")
+        ax.set_xlabel(xl); ax.set_ylabel(yl); ax.set_zlabel(r"$C_{out}$ (mg/Nm$^3$)")
         ax.set_title(title)
         ax.tick_params(colors = COLOR)
         ax.xaxis.label.set_color(COLOR); ax.yaxis.label.set_color(COLOR)
@@ -215,7 +236,7 @@ def plot_relation_3d(model, df, out_dir) :
     Qs = np.linspace(df["Q_Nm3h"].min(), df["Q_Nm3h"].max(), n)
     surf(ax3, Cis, Qs,
          lambda ci, q : predict_cout(params, Tin_med, ci, q, U_med, T_med),
-         "C_in (g/Nm$^3$)", "Q (Nm$^3$/h)", "C_out vs 入口浓度与流量")
+         r"C_in (g/Nm$^3$)", r"Q (Nm$^3$/h)", "C_out vs 入口浓度与流量")
 
     ax4 = fig.add_subplot(2, 2, 4, projection="3d")
     surf(ax4, U1s, T1s,

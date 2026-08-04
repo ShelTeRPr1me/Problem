@@ -57,11 +57,11 @@ def main() :
         P_scan.append(avg_P)
         print(f"  C_limit = {cl:.0f} -> avg P = {avg_P:.1f}")
 
-    fig, ax = plt.subplots(figsize = (10, 7))
+    fig, ax = plt.subplots(figsize = (8, 6))
     ax.plot(clims, P_scan, "o-", color=COLOR, markersize=6, linewidth=2)
     ax.axvline(10, color="red", linestyle="--", alpha=0.5, label="当前标准 10")
     ax.axvline(5, color="orange", linestyle="--", alpha=0.5, label="收紧标准 5")
-    ax.set_xlabel("排放限值 $C_{limit}$ (mg/Nm$^3$)")
+    ax.set_xlabel(r"排放限值 $C_{limit}$ (mg/Nm$^3$)")
     ax.set_ylabel("平均最优电耗 $\\bar{P}^*$ (kW)")
     ax.set_title("电耗-排放限值权衡曲线")
     ax.legend(); ax.grid(True, alpha = 0.3); style_ax(ax)
@@ -116,7 +116,7 @@ def main() :
     axes[0].set_xlabel("振打周期比值"); axes[0].set_ylabel("频次")
     axes[0].set_title("振打周期比值分布（1.0=同步）"); axes[0].legend(); style_ax(axes[0])
     axes[1].bar(["同步振打", "错峰振打"], [peak_sync, peak_stagger], color=[PALETTE[3], PALETTE[2]])
-    axes[1].set_ylabel("$C_{peak}$ (mg/Nm$^3$)")
+    axes[1].set_ylabel(r"$C_{peak}$ (mg/Nm$^3$)")
     axes[1].set_title("同步 vs 错峰振打峰值对比"); style_ax(axes[1])
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "rapping_sync.png"), dpi=150)
@@ -128,7 +128,7 @@ def main() :
         with open(sobol_path, "r", encoding="utf-8") as f:
             sob = json.load(f)
         names = sob["names"]
-        fig, axes = plt.subplots(1, 2, figsize = (16, 6))
+        fig, axes = plt.subplots(1, 2, figsize = (14, 6))
         x = np.arange(len(names))
         w = 0.35
         for ax, key, title in [(axes[0], "cout", "$C_{out}$ Sobol"), (axes[1], "power", "$P$ Sobol")]:

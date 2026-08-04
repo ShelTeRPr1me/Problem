@@ -36,12 +36,12 @@ def test_fit_k_nonneg(df_power) :
         assert k >= 0, "物理约束 k_i>=0"
 
 
-def test_fit_beta_nonneg(df_power) :
+def test_fit_beta_positive(df_power) :
     df, _, _ = df_power
     model = fit_power_model(df)
     if model.get("has_strike"):
         for b in model["beta_ext"]:
-            assert b >= 0, "物理约束 beta_i>=0"
+            assert b >= 1.0, "物理约束 beta_i>=1 (振打电机必耗电)"
 
 
 def test_predict_matches_fit(df_power) :

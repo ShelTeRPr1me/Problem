@@ -104,7 +104,7 @@ def main() :
     ps = [p["P"] for p in pareto]
     cks = [p["C_peak"] for p in pareto]
     ax.plot(cks, ps, "o-", color=COLOR, markersize=6, linewidth=2)
-    ax.set_xlabel("振打瞬时峰值 $C_{peak}$ (mg/Nm$^3$)")
+    ax.set_xlabel(r"振打瞬时峰值 $C_{peak}$ (mg/Nm$^3$)")
     ax.set_ylabel("总电耗 $P$ (kW)")
     ax.set_title(f"Pareto 前沿: 电耗 vs 振打峰值 (工况{high_regime['id']}, $C_{{in}}={Cin:.1f}$)")
     style_ax(ax)

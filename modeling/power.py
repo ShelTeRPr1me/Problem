@@ -23,8 +23,8 @@ def fit_power_model(df) :
             [1.0 / df[f"T{i}_s"].values for i in range(1, 5)] +
             [np.ones(len(df))]
         )
-        # k_i(前4) >= 0, β_i(中4) >= 0 (物理约束), c 自由
-        lo = np.concatenate([np.zeros(8), -np.inf * np.ones(1)])
+        # k_i(前4) >= 0, β_i(中4) >= 1 (振打电机必耗电, 工程下界), c 自由
+        lo = np.concatenate([np.zeros(4), np.ones(4), -np.inf * np.ones(1)])
         hi = np.inf * np.ones(9)
         res = lsq_linear(X_ext, P, bounds=(lo, hi), method="trf")
         coef9 = res.x
